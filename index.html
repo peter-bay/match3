@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>消消乐</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f6f8fd 0%, #e9edf7 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .container {
+            max-width: 1000px;
+            padding: 40px;
+            width: 100%;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 50px;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            padding: 20px;
+        }
+        .theme-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+        .theme-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .theme-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), rgba(255,255,255,0.5));
+            transform: translateY(100%);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .theme-card:hover::before {
+            transform: translateY(0);
+        }
+        .theme-card h2 {
+            margin: 0 0 15px 0;
+            color: #2c3e50;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+        .theme-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+            display: block;
+        }
+        .theme-description {
+            color: #666;
+            font-size: 1em;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>趣味消消乐</h1>
+        <div class="theme-grid">
+            <div class="theme-card" onclick="location.href='game.html?theme=cereal'">
+                <span class="theme-icon">🌾</span>
+                <h2>谷薯</h2>
+                <p class="theme-description">体验丰收的喜悦，与各种谷物和薯类作物互动</p>
+            </div>
+            <div class="theme-card" onclick="location.href='game.html?theme=fruit'">
+                <span class="theme-icon">🍎</span>
+                <h2>水果</h2>
+                <p class="theme-description">清新可口的水果世界，享受甜蜜的游戏乐趣</p>
+            </div>
+            <div class="theme-card" onclick="location.href='game.html?theme=vegetable'">
+                <span class="theme-icon">🥕</span>
+                <h2>蔬菜</h2>
+                <p class="theme-description">健康绿色的蔬菜乐园，探索营养的奥秘</p>
+            </div>
+            <div class="theme-card" onclick="location.href='game.html?theme=seasoning'">
+                <span class="theme-icon">🧂</span>
+                <h2>调味</h2>
+                <p class="theme-description">品味美食的精髓，感受调味料的魅力</p>
+            </div>
+            <div class="theme-card" onclick="location.href='game.html?theme=animal'">
+                <span class="theme-icon">🐼</span>
+                <h2>动物</h2>
+                <p class="theme-description">可爱的动物王国，与萌宠们一起欢乐游戏</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
