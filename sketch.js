@@ -1,5 +1,6 @@
-// 导入主题管理器
+// 导入主题管理器和音效管理器
 import { getCurrentTheme } from './themes/themeManager.js';
+import { initThemeEffects, playThemeEffect } from './themes/soundManager.js';
 
 // Matter.js 模块别名
 const { Engine, Render, Runner, Bodies, Composite, Mouse, MouseConstraint, Events, Body, Query } = Matter;
@@ -17,7 +18,10 @@ function getEmojiWord(emoji) {
     return emojiData ? emojiData.word : '';
 }
 
-// 初始化音效
+// 初始化主题音效
+initThemeEffects();
+
+// 初始化单词音效
 currentTheme.emojiData.forEach(({emoji}) => {
     // 单词发音
     const word = getEmojiWord(emoji);
@@ -67,6 +71,79 @@ let level = 1;
 const maxScore = 31500;
 const emojiUsageLimit = 63;
 const emojiUsageCount = {};
+
+// 游戏难度设置
+let gameDifficulty = 'veryEasy'; // 默认非常简单难度
+const difficultyConfig = {
+    veryEasy: {
+        emojiPoolSize: 0.2, // 使用40%的emoji池
+        matchProbability: 1.8 // 提高80%匹配概率
+    },
+    easy: {
+        emojiPoolSize: 0.4, // 使用60%的emoji池
+        matchProbability: 1.4 // 提高40%匹配概率
+    },
+    medium: {
+        emojiPoolSize: 0.6, // 使用80%的emoji池
+        matchProbability: 1.0 // 正常匹配概率
+    },
+    hard: {
+        emojiPoolSize: 0.8, // 使用90%的emoji池
+        matchProbability: 0.7 // 降低30%匹配概率
+    },
+    veryHard: {
+        emojiPoolSize: 1.0, // 使用100%的emoji池
+        matchProbability: 0.5 // 降低50%匹配概率
+    }
+};
+
+// 添加难度控制滑块
+const difficultyControl = document.createElement('div');
+difficultyControl.style.position = 'absolute';
+difficultyControl.style.top = '25px';
+difficultyControl.style.left = '50%';
+difficultyControl.style.transform = 'translateX(-50%)';
+difficultyControl.style.color = 'white';
+difficultyControl.style.fontFamily = 'Arial';
+difficultyControl.style.fontSize = '16px';
+difficultyControl.style.zIndex = '10000';
+difficultyControl.innerHTML = `
+    <div style="margin-bottom: 5px;">难度: <span id="difficultyLabel">非常简单</span></div>
+    <input type="range" min="0" max="4" value="0" step="1" id="difficultySlider" style="width: 150px;">
+`;
+document.body.appendChild(difficultyControl);
+
+// 监听难度变化
+const difficultySlider = document.getElementById('difficultySlider');
+const difficultyLabel = document.getElementById('difficultyLabel');
+difficultySlider.addEventListener('input', (e) => {
+    const value = parseInt(e.target.value);
+    switch(value) {
+        case 0:
+            gameDifficulty = 'veryEasy';
+            difficultyLabel.textContent = '非常简单';
+            break;
+        case 1:
+            gameDifficulty = 'easy';
+            difficultyLabel.textContent = '简单';
+            break;
+        case 2:
+            gameDifficulty = 'medium';
+            difficultyLabel.textContent = '中等';
+            break;
+        case 3:
+            gameDifficulty = 'hard';
+            difficultyLabel.textContent = '困难';
+            break;
+        case 4:
+            gameDifficulty = 'veryHard';
+            difficultyLabel.textContent = '极难';
+            break;
+    }
+    // 重置emoji池
+    shuffledEmojis = [];
+    currentIndex = 0;
+});
 
 // 记录最近生成的emoji队列
 const recentEmojis = [];
@@ -176,17 +253,21 @@ let shuffledEmojis = [];
 let currentIndex = 0;
 
 function getRandomEmoji() {
-    // 使用完整的emoji池
-    const availableEmojis = currentTheme.emojiData;
+    // 根据难度获取emoji池大小
+    const config = difficultyConfig[gameDifficulty];
+    const poolSize = Math.floor(currentTheme.emojiData.length * config.emojiPoolSize);
+    const availableEmojis = currentTheme.emojiData.slice(0, poolSize);
     
     // 如果没有洗牌的emoji或者已经用完了当前洗牌的结果
     if (shuffledEmojis.length === 0 || currentIndex >= shuffledEmojis.length) {
         // 创建新的emoji数组
         shuffledEmojis = availableEmojis.map(({emoji}) => {
             const usageCount = emojiUsageCount[emoji] || 0;
+            // 根据难度调整匹配概率
+            const weight = Math.max(0.1, 1 - (usageCount / emojiUsageLimit)) * config.matchProbability;
             return {
                 emoji,
-                weight: Math.max(0.1, 1 - (usageCount / emojiUsageLimit))
+                weight
             };
         });
         
@@ -254,10 +335,10 @@ function checkMatches() {
     if (!wordDisplay) {
         wordDisplay = document.createElement('div');
         wordDisplay.className = 'word-display';
-        wordDisplay.style.position = 'fixed';
-        wordDisplay.style.top = '50%';
+        wordDisplay.style.position = 'absolute';
+        wordDisplay.style.top = '75px';
         wordDisplay.style.left = '50%';
-        wordDisplay.style.transform = 'translate(-50%, -50%)';
+        wordDisplay.style.transform = 'translateX(-50%)';
         wordDisplay.style.color = 'white';
         wordDisplay.style.fontFamily = 'Arial';
         wordDisplay.style.fontSize = '24px';
@@ -270,10 +351,18 @@ function checkMatches() {
         wordDisplay.style.opacity = '0';
         wordDisplay.style.transition = 'opacity 0.3s ease-in-out';
         wordDisplay.style.pointerEvents = 'none';
+        wordDisplay.style.zIndex = '10000';
         document.body.appendChild(wordDisplay);
     }
 
     if (matches.size >= 3) {
+        // 播放主题音效
+        const matchedEmoji = Array.from(matches)[0];
+        const emojiData = currentTheme.emojiData.find(data => data.emoji === matchedEmoji.gameEmoji);
+        if (emojiData && emojiData.theme) {
+            playThemeEffect(emojiData.theme);
+        }
+
         // 更新分数
         score += 30;
         // 移除匹配的物体
@@ -355,7 +444,17 @@ Events.on(mouseConstraint, 'mousedown', function(event) {
         mousePosition.x,
         mousePosition.y
     );
-    if (shape) Composite.add(world, shape);
+    if (shape) {
+        Composite.add(world, shape);
+        // 播放主题音效
+        const emojiData = currentTheme.emojiData.find(data => data.emoji === shape.gameEmoji);
+        if (emojiData && emojiData.theme) {
+            playThemeEffect(emojiData.theme);
+        } else {
+            // 如果没有指定主题，使用默认主题
+            playThemeEffect('fruit');
+        }
+    }
 });
 
 // 定期添加新的形状
@@ -368,7 +467,14 @@ function updateShapeInterval() {
                 Math.random() * (gameWidth - 100) + 50,
                 50
             );
-            if (shape) Composite.add(world, shape);
+            if (shape) {
+                Composite.add(world, shape);
+                // 播放主题音效
+                const emojiData = currentTheme.emojiData.find(data => data.emoji === shape.gameEmoji);
+                if (emojiData && emojiData.theme) {
+                    playThemeEffect(emojiData.theme);
+                }
+            }
         }
     }, 2000);
 }
@@ -391,8 +497,9 @@ Events.on(engine, 'beforeUpdate', () => {
 // 添加分数显示
 const scoreDisplay = document.createElement('div');
 scoreDisplay.style.position = 'absolute';
-scoreDisplay.style.top = '20px';
-scoreDisplay.style.left = '20px';
+scoreDisplay.style.top = '25px';
+scoreDisplay.style.left = '30px';
+scoreDisplay.style.zIndex = '10000';
 scoreDisplay.style.color = 'white';
 scoreDisplay.style.fontFamily = 'Arial';
 scoreDisplay.style.fontSize = '20px';
