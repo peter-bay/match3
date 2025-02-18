@@ -100,9 +100,8 @@ const difficultyConfig = {
 // 添加难度控制滑块
 const difficultyControl = document.createElement('div');
 difficultyControl.style.position = 'absolute';
-difficultyControl.style.top = '25px';
-difficultyControl.style.left = '50%';
-difficultyControl.style.transform = 'translateX(-50%)';
+difficultyControl.style.top = '65px';
+difficultyControl.style.left = '30px';
 difficultyControl.style.color = 'white';
 difficultyControl.style.fontFamily = 'Arial';
 difficultyControl.style.fontSize = '16px';
