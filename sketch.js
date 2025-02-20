@@ -329,31 +329,6 @@ function checkMatches() {
         }
     });
 
-    // 添加单词显示区域
-    let wordDisplay = document.querySelector('.word-display');
-    if (!wordDisplay) {
-        wordDisplay = document.createElement('div');
-        wordDisplay.className = 'word-display';
-        wordDisplay.style.position = 'absolute';
-        wordDisplay.style.top = '75px';
-        wordDisplay.style.left = '50%';
-        wordDisplay.style.transform = 'translateX(-50%)';
-        wordDisplay.style.color = 'white';
-        wordDisplay.style.fontFamily = 'Arial';
-        wordDisplay.style.fontSize = '24px';
-        wordDisplay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-        wordDisplay.style.padding = '15px 30px';
-        wordDisplay.style.borderRadius = '10px';
-        wordDisplay.style.display = 'flex';
-        wordDisplay.style.alignItems = 'center';
-        wordDisplay.style.gap = '10px';
-        wordDisplay.style.opacity = '0';
-        wordDisplay.style.transition = 'opacity 0.3s ease-in-out';
-        wordDisplay.style.pointerEvents = 'none';
-        wordDisplay.style.zIndex = '10000';
-        document.body.appendChild(wordDisplay);
-    }
-
     if (matches.size >= 3) {
         // 播放主题音效
         const matchedEmoji = Array.from(matches)[0];
@@ -511,4 +486,37 @@ Events.on(engine, 'beforeUpdate', () => {
 
 // 运行引擎
 Runner.run(engine);
+Render.run(render);
+// 添加单词显示
+const wordDisplay = document.createElement('div');
+// 设置固定定位，使元素固定在视窗中央
+wordDisplay.style.position = 'fixed';
+// 设置上下左右为50%，配合transform实现完美居中
+wordDisplay.style.top = '50%';
+wordDisplay.style.left = '50%';
+// 使用transform进行X和Y轴平移，实现完美居中
+wordDisplay.style.transform = 'translate(-50%, -50%)';
+// 设置较高的z-index确保显示在游戏元素上层
+wordDisplay.style.zIndex = '10001';
+// 设置文字颜色为白色，确保在深色背景上清晰可见
+wordDisplay.style.color = 'white';
+// 使用Arial字体，确保在各个平台上的一致性
+wordDisplay.style.fontFamily = 'Arial';
+// 设置字体大小为24px，使文字清晰可读
+wordDisplay.style.fontSize = '24px';
+// 设置文本水平居中对齐
+wordDisplay.style.textAlign = 'center';
+// 设置半透明黑色背景，提高文字可读性
+wordDisplay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+// 设置内边距，使文字与背景之间有适当的空间
+wordDisplay.style.padding = '10px 20px';
+// 设置圆角边框，使显示区域更美观
+wordDisplay.style.borderRadius = '10px';
+// 初始设置透明度为0（隐藏状态）
+wordDisplay.style.opacity = '0';
+// 添加过渡效果，使显示/隐藏的切换更平滑
+wordDisplay.style.transition = 'opacity 0.3s';
+// 将单词显示区域添加到页面中
+document.body.appendChild(wordDisplay);
+
 Render.run(render);
