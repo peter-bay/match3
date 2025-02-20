@@ -492,7 +492,7 @@ const wordDisplay = document.createElement('div');
 // 设置固定定位，使元素固定在视窗中央
 wordDisplay.style.position = 'fixed';
 // 设置上下左右为50%，配合transform实现完美居中
-wordDisplay.style.top = '50%';
+wordDisplay.style.top = '20%';
 wordDisplay.style.left = '50%';
 // 使用transform进行X和Y轴平移，实现完美居中
 wordDisplay.style.transform = 'translate(-50%, -50%)';
